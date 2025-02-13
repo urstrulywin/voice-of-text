@@ -43,7 +43,9 @@ const TextToSpeech = () => {
         body: { text, voice },
       });
 
-      if (response.error) throw new Error(response.error.message);
+      if (response.error) {
+        throw new Error(response.error.message || response.error);
+      }
 
       // Play the audio
       const audio = new Audio(response.data.audioUrl);
@@ -57,7 +59,7 @@ const TextToSpeech = () => {
       console.error("Error generating speech:", error);
       toast({
         title: "Error",
-        description: "Failed to generate speech. Please try again.",
+        description: error.message || "Failed to generate speech. Please try again.",
         variant: "destructive",
       });
     } finally {

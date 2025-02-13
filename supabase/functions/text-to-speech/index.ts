@@ -40,6 +40,7 @@ serve(async (req) => {
     if (!response.ok) {
       const error = await response.json()
       console.error('OpenAI API error:', error)
+      // Pass through the actual OpenAI error message
       throw new Error(error.error?.message || 'OpenAI API request failed')
     }
 
@@ -58,8 +59,12 @@ serve(async (req) => {
     )
   } catch (error) {
     console.error('Error in text-to-speech function:', error)
+    // Return a more user-friendly error message for quota errors
+    const errorMessage = error.message.includes('exceeded your current quota') 
+      ? 'OpenAI API quota exceeded. Please check your billing details.'
+      : error.message
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
